@@ -1,0 +1,30 @@
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+exports.handler = async (event) => {
+    // 1. Setup with your Netlify Dashboard Key
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    // 2. Use the most basic name - this allows the library 
+    // to auto-select the best available version.
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    try {
+        const { text } = JSON.parse(event.body);
+        const prompt = `You are the CITC AI Specialist. Answer as a Saudi regulatory expert: ${text}`;
+        
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const reply = response.text();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ reply: reply })
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ reply: "Brain Error: " + error.message })
+        };
+    }
+};
+
