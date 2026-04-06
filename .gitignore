@@ -1,2 +1,13 @@
 # Local Netlify folder
 .netlify
+# Security: Never upload the actual keys
+.env
+secret.js
+
+# Dependencies: No need to upload these (Netlify installs them automatically)
+node_modules/
+
+# Logs and OS files
+npm-debug.log*
+.DS_Store
+

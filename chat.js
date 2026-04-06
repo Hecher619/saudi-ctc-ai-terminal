@@ -1,4 +1,4 @@
-const persona = require('../../config/specialist');
+Nconst persona = require('../../config/specialist');
 const features = require('../../config/features');
 
 exports.handler = async (event, context) => {
@@ -14,13 +14,13 @@ exports.handler = async (event, context) => {
 
     try {
         const { prompt } = JSON.parse(event.body);
-        const apiKey = "AIzaSyDPtsPg31hVtBUYwCIblH1sFzBeMmRXVj4";
+        const apiKey = process.env.GEMINI_API_KEY;
         
-        // Use the 3.1 Flash Lite model for public speed
+        
         const model = "gemini-3.1-flash-lite-preview";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        // Process the prompt through our new Feature Engine first
+        
         const processedPrompt = features.processQuery(prompt);
 
         const response = await fetch(url, {
@@ -37,7 +37,7 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
-        // Robust extraction for public use
+        
         let aiText = "Specialist encountered a data packet error.";
         if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
             aiText = data.candidates[0].content.parts[0].text;

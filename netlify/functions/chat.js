@@ -11,7 +11,7 @@ exports.handler = async (event) => {
 
   try {
     const { prompt } = JSON.parse(event.body);
-    const apiKey = "AIzaSyDPtsPg31hVtBUYwCIblH1sFzBeMmRXVj4";
+    const apiKey = process.env.GEMINI_API_KEY;
     const model = "gemini-3.1-flash-lite-preview";
     
     // Fixed URL and added the persona logic here inside the try block
