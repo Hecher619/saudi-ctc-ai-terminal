@@ -1,0 +1,31 @@
+// config/features.js
+module.exports = {
+  processQuery: (prompt) => {
+    const input = prompt.toLowerCase().trim();
+
+    // FEATURE: System Help / Directory
+    if (input === "/help" || input === "help" || input === "start") {
+      return `COMMAND_DETECTED: [SYSTEM_HELP]
+      INSTRUCTION: Display a professional 'Available Protocols' list to the user. 
+      Include:
+      1. /cert - Type Approval & Device Certification.
+      2. /spectrum - National Frequency Plan & 5G/6G allocation.
+      3. /report - Digital Fraud & Malicious Communication reporting.
+      4. /data - CST Open Data & Market Indicators.
+      Tone: High-level system overview.`;
+    }
+
+    // FEATURE: Type Approval
+    if (input.includes("/cert") || input.includes("approval")) {
+      return "COMMAND_DETECTED: [CERT_NAVIGATOR] INSTRUCTION: Provide technical specs for Saudi device certification.";
+    }
+
+    // FEATURE: Spectrum
+    if (input.includes("/spectrum") || input.includes("frequency")) {
+      return "COMMAND_DETECTED: [NFP_QUERY] INSTRUCTION: Explain Saudi National Frequency Plan for requested bands.";
+    }
+
+    return prompt;
+  }
+};
+

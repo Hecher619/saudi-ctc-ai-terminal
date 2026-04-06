@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CITC AI | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); }
+        .sidebar { background: #050810; }
+        .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+    </style>
+</head>
+
+<body class="bg-[#0b0f1a] text-gray-200 h-screen flex overflow-hidden">
+
+    <div id="auth-box" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0f1a]">
+        <div class="bg-[#1e293b] p-10 rounded-3xl shadow-2xl border border-gray-800 w-full max-w-sm text-center">
+            <h1 class="text-4xl font-black mb-8 italic text-[#00D2FF]">CITC AI</h1>
+            <input id="email" type="email" placeholder="Email" class="w-full p-4 rounded-xl bg-black/30 border border-gray-700 mb-4 outline-none focus:border-[#00D2FF]">
+            <input id="password" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-black/30 border border-gray-700 mb-6 outline-none focus:border-[#00D2FF]">
+            <button onclick="handleAuth('login')" class="w-full bg-[#00D2FF] text-black font-bold py-4 rounded-xl hover:scale-105 transition-all">Enter Portal</button>
+            <button onclick="handleAuth('signup')" class="mt-4 text-sm text-gray-500 hover:text-white underline">Create Specialist Account</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden flex w-full h-screen">
+        <aside class="w-64 sidebar border-r border-gray-800 p-6 hidden md:flex flex-col">
+            <h2 class="text-[#00D2FF] font-bold text-xl mb-10 italic">CITC AI</h2>
+            <div class="flex-1 space-y-4">
+                <div class="text-xs text-gray-500 uppercase tracking-widest">Recent Chats</div>
+                <div class="p-3 glass rounded-lg text-sm border border-gray-700 cursor-pointer hover:bg-white/5">CST GEN002 Query</div>
+            </div>
+            <button onclick="sb.auth.signOut().then(() => location.reload())" class="text-xs text-red-400 hover:underline">Logout</button>
+        </aside>
+
+        <main class="flex-1 flex flex-col relative">
+            <header class="p-6 border-b border-gray-800 flex justify-between items-center bg-[#0b0f1a]/50">
+                <span class="text-sm font-semibold text-gray-400">CITC Regulatory Engine v1.0</span>
+                <div class="w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
+            </header>
+
+            <div id="chat-flow" class="flex-1 overflow-y-auto p-8 space-y-8 max-w-4xl mx-auto w-full">
+                <div class="flex gap-5">
+                    <div class="w-10 h-10 bg-[#00D2FF] rounded-xl flex-shrink-0 flex items-center justify-center text-black font-bold shadow-[0_0_15px_#00D2FF]">C</div>
+                    <div class="space-y-3">
+                        <p class="text-sm font-bold text-[#00D2FF]">CITC AI</p>
+                        <p class="text-gray-300 leading-relaxed">Welcome back, Specialist. How can I assist with CITC regulations today?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 bg-gradient-to-t from-[#0b0f1a] to-transparent">
+                <div class="max-w-3xl mx-auto relative group">
+                    <input id="msg-input" type="text" placeholder="Type your request..."
+                           class="w-full bg-[#1e293b]/50 border border-gray-700 rounded-2xl py-5 pl-8 pr-16 focus:border-[#00D2FF] outline-none transition-all shadow-2xl glass text-lg">
+                    <button onclick="send()" class="absolute right-4 top-4 bg-[#00D2FF] text-black p-2 rounded-xl hover:rotate-12 transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const SB_URL = "https://iemeaafepmwnxbvbubtf.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllbWVhYWZlcG13bnhidmJ1YnRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTM1MTUsImV4cCI6MjA4OTM2OTUxNX0.95z1w6kByAcOp12hji68fjttvc4yCHChIOX6OIcVKso";
+
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        async function handleAuth(type) {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                Swal.fire({ icon: 'warning', title: 'Missing Info', text: 'Enter email and password.' });
+                return;
+            }
+
+            const { data, error } = (type === 'login')
+                ? await sb.auth.signInWithPassword({ email, password })
+                : await sb.auth.signUp({ email, password });
+
+            if (error) {
+                Swal.fire({ icon: 'error', title: 'Auth Failed', text: error.message });
+            } else {
+                document.getElementById('auth-box').style.display = 'none';
+                document.getElementById('dashboard').classList.remove('hidden');
+            }
+        }
+
+        async function send() {
+            const input = document.getElementById('msg-input');
+            const flow = document.getElementById('chat-flow');
+            const text = input.value;
+            if(!text) return;
+
+            input.value = "";
+            flow.innerHTML += `<div class="flex justify-end mb-4"><div class="bg-blue-600 p-4 rounded-2xl text-white shadow-lg">${text}</div></div>`;
+
+            const loadId = "L-" + Date.now();
+            flow.innerHTML += `<div id="${loadId}" class="flex gap-5 loading-pulse"><div class="w-10 h-10 bg-gray-700 rounded-xl"></div><div class="space-y-2 text-gray-500 text-xs mt-2 italic">Analyzing Regulations...</div></div>`;
+            flow.scrollTop = flow.scrollHeight;
+
+            try {
+                const res = await fetch("https://iemeaafepmwnxbvbubtf.supabase.co/functions/v1/chat", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: text }] }]
+                    })
+                });
+
+                const data = await res.json();
+                document.getElementById(loadId).remove();
+
+              const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "CITC Regulatory Engine v1.0 - Active";
+
+
+                flow.innerHTML += `
+                    <div class="flex gap-5 mb-8">
+                        <div class="w-10 h-10 bg-[#00D2FF] rounded-xl flex items-center justify-center text-black font-bold shadow-[0_0_15px_#00D2FF]">C</div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold text-[#00D2FF]">CITC AI</p>
+                            <div class="text-gray-300 leading-relaxed bg-white/5 p-5 rounded-2xl border border-white/5 shadow-xl">${botReply}</div>
+                        </div>
+                    </div>`;
+            } catch (e) {
+                if(document.getElementById(loadId)) document.getElementById(loadId).remove();
+                flow.innerHTML += `<p class="text-red-500 text-sm">System Error: Check Connection.</p>`;
+            }
+            flow.scrollTop = flow.scrollHeight;
+        }
+
+        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
+    </script>
+</body>
+</html>
+

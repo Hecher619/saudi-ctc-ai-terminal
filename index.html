@@ -3,138 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CITC AI | Dashboard</title>
+    <title>CTC Specialist Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); }
-        .sidebar { background: #050810; }
-        .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+        .hidden { display: none !important; }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+        .status-pulse { animation: pulse-gold 2s infinite; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
     </style>
 </head>
+<body class="bg-[#020617] text-slate-200 font-sans min-h-screen flex overflow-hidden">
 
-<body class="bg-[#0b0f1a] text-gray-200 h-screen flex overflow-hidden">
-
-    <div id="auth-box" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0b0f1a]">
-        <div class="bg-[#1e293b] p-10 rounded-3xl shadow-2xl border border-gray-800 w-full max-w-sm text-center">
-            <h1 class="text-4xl font-black mb-8 italic text-[#00D2FF]">CITC AI</h1>
-            <input id="email" type="email" placeholder="Email" class="w-full p-4 rounded-xl bg-black/30 border border-gray-700 mb-4 outline-none focus:border-[#00D2FF]">
-            <input id="password" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-black/30 border border-gray-700 mb-6 outline-none focus:border-[#00D2FF]">
-            <button onclick="handleAuth('login')" class="w-full bg-[#00D2FF] text-black font-bold py-4 rounded-xl hover:scale-105 transition-all">Enter Portal</button>
-            <button onclick="handleAuth('signup')" class="mt-4 text-sm text-gray-500 hover:text-white underline">Create Specialist Account</button>
+    <div id="login-gate" class="fixed inset-0 z-50 flex items-center justify-center bg-[#020617] p-6">
+        <div class="w-full max-w-sm bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
+            <h1 class="text-3xl font-black text-white italic text-center mb-6"><span class="text-yellow-500">CTC</span> ENGINE</h1>
+            <input id="gate-pass" type="password" placeholder="Access Code" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 mb-4 focus:outline-none focus:border-yellow-600 transition-colors">
+            <button onclick="checkAccess()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-black py-3 rounded-xl uppercase transition-all">Grant Access</button>
         </div>
     </div>
 
-    <div id="dashboard" class="hidden flex w-full h-screen">
-        <aside class="w-64 sidebar border-r border-gray-800 p-6 hidden md:flex flex-col">
-            <h2 class="text-[#00D2FF] font-bold text-xl mb-10 italic">CITC AI</h2>
-            <div class="flex-1 space-y-4">
-                <div class="text-xs text-gray-500 uppercase tracking-widest">Recent Chats</div>
-                <div class="p-3 glass rounded-lg text-sm border border-gray-700 cursor-pointer hover:bg-white/5">CST GEN002 Query</div>
+    <div id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex-shrink-0 flex flex-col hidden md:flex">
+        <div class="p-6 border-b border-slate-800">
+            <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Session Logs</h2>
+        </div>
+        <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-2">
             </div>
-            <button onclick="sb.auth.signOut().then(() => location.reload())" class="text-xs text-red-400 hover:underline">Logout</button>
-        </aside>
+    </div>
 
-        <main class="flex-1 flex flex-col relative">
-            <header class="p-6 border-b border-gray-800 flex justify-between items-center bg-[#0b0f1a]/50">
-                <span class="text-sm font-semibold text-gray-400">CITC Regulatory Engine v1.0</span>
-                <div class="w-3 h-3 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
-            </header>
-
-            <div id="chat-flow" class="flex-1 overflow-y-auto p-8 space-y-8 max-w-4xl mx-auto w-full">
-                <div class="flex gap-5">
-                    <div class="w-10 h-10 bg-[#00D2FF] rounded-xl flex-shrink-0 flex items-center justify-center text-black font-bold shadow-[0_0_15px_#00D2FF]">C</div>
-                    <div class="space-y-3">
-                        <p class="text-sm font-bold text-[#00D2FF]">CITC AI</p>
-                        <p class="text-gray-300 leading-relaxed">Welcome back, Specialist. How can I assist with CITC regulations today?</p>
-                    </div>
+    <div id="main-interface" class="flex-1 flex flex-col h-screen hidden">
+        <header class="p-6 border-b border-yellow-600/10 flex justify-between items-center bg-[#020617]">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-black italic text-white"><span class="text-yellow-500 text-sm">SAUDI</span> CTC</h1>
+                <div class="flex items-center gap-2 text-[10px] font-bold text-slate-600 uppercase">
+                    <div class="w-2 h-2 bg-yellow-500 rounded-full status-pulse"></div>
+                    <span>Authorized Entry</span>
                 </div>
             </div>
+            <button onclick="location.reload()" class="text-[10px] text-slate-500 hover:text-red-500 uppercase font-bold tracking-widest">Disconnect</button>
+        </header>
 
-            <div class="p-8 bg-gradient-to-t from-[#0b0f1a] to-transparent">
-                <div class="max-w-3xl mx-auto relative group">
-                    <input id="msg-input" type="text" placeholder="Type your request..."
-                           class="w-full bg-[#1e293b]/50 border border-gray-700 rounded-2xl py-5 pl-8 pr-16 focus:border-[#00D2FF] outline-none transition-all shadow-2xl glass text-lg">
-                    <button onclick="send()" class="absolute right-4 top-4 bg-[#00D2FF] text-black p-2 rounded-xl hover:rotate-12 transition-all">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                    </button>
-                </div>
+        <main id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6 pb-40">
+            <div class="bg-yellow-500/5 border border-yellow-600/10 p-4 rounded-xl text-xs text-yellow-500/60 font-mono italic text-center">
+                System Initialized. Accessing IT and Telecom Databanks...
             </div>
         </main>
+
+        <div class="p-6 bg-slate-900/50 backdrop-blur-xl border-t border-slate-800">
+            <div class="max-w-3xl mx-auto flex gap-3">
+                <input id="user-input" type="text" placeholder="Consult CTC Specialists..." class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3 focus:outline-none focus:border-yellow-600/50 transition-all text-sm">
+                <button onclick="sendQuery()" class="bg-yellow-600 hover:bg-yellow-500 text-black font-black px-8 rounded-2xl text-xs uppercase transition-all">Send</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const SB_URL = "https://iemeaafepmwnxbvbubtf.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllbWVhYWZlcG13bnhidmJ1YnRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTM1MTUsImV4cCI6MjA4OTM2OTUxNX0.95z1w6kByAcOp12hji68fjttvc4yCHChIOX6OIcVKso";
-
-        const sb = supabase.createClient(SB_URL, SB_KEY);
-
-        async function handleAuth(type) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                Swal.fire({ icon: 'warning', title: 'Missing Info', text: 'Enter email and password.' });
-                return;
-            }
-
-            const { data, error } = (type === 'login')
-                ? await sb.auth.signInWithPassword({ email, password })
-                : await sb.auth.signUp({ email, password });
-
-            if (error) {
-                Swal.fire({ icon: 'error', title: 'Auth Failed', text: error.message });
+        // ACCESS CONTROL
+        function checkAccess() {
+            const passInput = document.getElementById('gate-pass').value;
+            if (passInput === 'CTC2026') {
+                document.getElementById('login-gate').classList.add('hidden');
+                document.getElementById('main-interface').classList.remove('hidden');
+                console.log("Access Granted");
             } else {
-                document.getElementById('auth-box').style.display = 'none';
-                document.getElementById('dashboard').classList.remove('hidden');
+                alert("ACCESS DENIED: INVALID CREDENTIALS");
+                document.getElementById('gate-pass').value = '';
             }
         }
 
-        async function send() {
-            const input = document.getElementById('msg-input');
-            const flow = document.getElementById('chat-flow');
-            const text = input.value;
-            if(!text) return;
+        // QUERY HANDLING
+        async function sendQuery() {
+            const input = document.getElementById('user-input');
+            const container = document.getElementById('chat-container');
+            const history = document.getElementById('history-list');
+            const query = input.value.trim();
+            
+            if (!query) return;
 
-            input.value = "";
-            flow.innerHTML += `<div class="flex justify-end mb-4"><div class="bg-blue-600 p-4 rounded-2xl text-white shadow-lg">${text}</div></div>`;
+            // 1. Add to Sidebar Logs
+            const logItem = document.createElement('div');
+            logItem.className = 'text-[10px] text-slate-500 border border-slate-800 p-2 rounded hover:bg-slate-800 truncate cursor-default transition-colors';
+            logItem.innerText = query;
+            history.prepend(logItem);
 
-            const loadId = "L-" + Date.now();
-            flow.innerHTML += `<div id="${loadId}" class="flex gap-5 loading-pulse"><div class="w-10 h-10 bg-gray-700 rounded-xl"></div><div class="space-y-2 text-gray-500 text-xs mt-2 italic">Analyzing Regulations...</div></div>`;
-            flow.scrollTop = flow.scrollHeight;
+            // 2. Add User Bubble to UI
+            container.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-slate-800/80 border border-slate-700 px-5 py-3 rounded-2xl rounded-tr-none max-w-[80%] text-sm">
+                        ${query}
+                    </div>
+                </div>`;
+            
+            input.value = ''; // Clear input field
+
+            // 3. Show Loading State
+            const loaderId = 'loader-' + Date.now();
+            container.innerHTML += `
+                <div id="${loaderId}" class="text-[10px] text-yellow-600 animate-pulse font-mono pl-2 tracking-widest uppercase">
+                    Establishing Uplink...
+                </div>`;
+            container.scrollTop = container.scrollHeight;
 
             try {
-                const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=AIzaSyAc-TlAIumBeYm-tcMzPRlk--m36pmHBsA", {
+                // 4. Fetch from Netlify Function
+                const res = await fetch('/.netlify/functions/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: text }] }]
+                    body: JSON.stringify({ 
+                        prompt: query,
+                        context: "Specialist Instruction: You are a CTC Saudi Arabia Specialist." 
                     })
                 });
 
                 const data = await res.json();
-                document.getElementById(loadId).remove();
+                
+                // Remove loader
+                const loaderElem = document.getElementById(loaderId);
+                if(loaderElem) loaderElem.remove();
 
-                const botReply = data.candidates[0].content.parts[0].text;
-
-                flow.innerHTML += `
-                    <div class="flex gap-5 mb-8">
-                        <div class="w-10 h-10 bg-[#00D2FF] rounded-xl flex items-center justify-center text-black font-bold shadow-[0_0_15px_#00D2FF]">C</div>
-                        <div class="space-y-2">
-                            <p class="text-sm font-bold text-[#00D2FF]">CITC AI</p>
-                            <div class="text-gray-300 leading-relaxed bg-white/5 p-5 rounded-2xl border border-white/5 shadow-xl">${botReply}</div>
-                        </div>
+                // 5. Display Specialist Response
+                container.innerHTML += `
+                    <div class="bg-slate-900 border-l-2 border-yellow-600 p-6 rounded-r-2xl shadow-xl">
+                        <span class="text-[9px] font-black text-yellow-600 tracking-widest uppercase mb-4 block">Official CTC Data Packet</span>
+                        <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">${data.text}</div>
                     </div>`;
-            } catch (e) {
-                if(document.getElementById(loadId)) document.getElementById(loadId).remove();
-                flow.innerHTML += `<p class="text-red-500 text-sm">System Error: Check Connection.</p>`;
+            } catch (err) {
+                const loaderElem = document.getElementById(loaderId);
+                if(loaderElem) loaderElem.innerText = 'CONNECTION ERROR: FAILOVER NODES EXHAUSTED';
+                console.error(err);
             }
-            flow.scrollTop = flow.scrollHeight;
+            
+            container.scrollTop = container.scrollHeight;
         }
 
-        document.getElementById('msg-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') send(); });
+        // Handle 'Enter' key in input
+        document.getElementById('user-input').addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') sendQuery(); 
+        });
+        
+        // Handle 'Enter' key in password gate
+        document.getElementById('gate-pass').addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') checkAccess(); 
+        });
     </script>
 </body>
 </html>
