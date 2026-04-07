@@ -15,15 +15,18 @@ An immersive, production-ready AI gateway engineered for the Saudi telecommunica
 * **Observability:** Built a custom CLI diagnostic suite (`debug.js`) for real-time API health monitoring and payload validation.
 ### 🗺️ System Data Flow (The "Edge" Pipeline)
 
+### 🗺️ System Data Flow (The "Edge" Pipeline)
+
 ```mermaid
 graph TD
-    A[Terminal] --> B(Netlify Edge)
-    B --> C(Persona Engine)
+    A[Terminal] --> B[Netlify Edge]
+    B --> C[Persona Engine]
     C --> D[Gemini API]
     D --> C
     C --> B
     B --> A
-    B --> E[(Audit Logs)]
+    B --> E[Audit Logs]
+
 
 🛡️ Core Features
 ​Custom Persona Engine: Injects deep regulatory context into every inference call.
