@@ -1,3 +1,7 @@
+![License](https://img.shields.io/github/license/Hecher619/saudi-ctc-ai-terminal?color=gold)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Deployment](https://img.shields.io/badge/deployment-Netlify-00C7B7)
+![Environment](https://img.shields.io/badge/environment-Termux%20Linux-orange)
 # 🇸🇦 Saudi CTC AI Specialist Terminal (V1.0)
 
 ### 🚀 Overview
