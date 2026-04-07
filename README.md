@@ -13,19 +13,28 @@ An immersive, production-ready AI gateway engineered for the Saudi telecommunica
 * **Backend:** Node.js Serverless functions deployed via **Netlify**, isolating business logic from the client.
 * **Security:** Implemented **Zero-Trust** secret management. API keys are handled via server-side environment variables.
 * **Observability:** Built a custom CLI diagnostic suite (`debug.js`) for real-time API health monitoring and payload validation.
-### 🗺️ System Data Flow (The "Edge" Pipeline)
+### 💎 System Architecture (The "Edge" Performance)
 
-### 🗺️ System Data Flow (The "Edge" Pipeline)
+| Layer | Technology | Role |
+| :--- | :--- | :--- |
+| **Interface** | Termux / Bash | Mobile-First DevOps Environment |
+| **Logic Gate** | Netlify Edge (Deno) | Serverless Inference & Security |
+| **AI Engine** | Gemini 1.5 Flash | Regulatory Logic & Persona Engine |
+| **Security** | Zero-Trust / ENV | API Key Protection & Sanitization |
+| **Monitoring** | CLI Diagnostics | Real-time Latency & Trace Tracking |
 
-```mermaid
-graph TD
-    A[Terminal] --> B[Netlify Edge]
-    B --> C[Persona Engine]
-    C --> D[Gemini API]
-    D --> C
-    C --> B
-    B --> A
-    B --> E[Audit Logs]
+---
+
+### 🛡️ Core Features
+* **Custom Persona Engine:** Injects deep regulatory context into every inference call, specifically tuned for CITC/CST frameworks.
+* **Defensive Programming:** Implemented circuit breakers and AbortControllers to handle API spikes and prevent serverless timeouts.
+* **Immersive UX:** A "Cyber-Terminal" interface designed for engineers, featuring an authorized entry gate and low-latency feedback.
+
+### 📖 Execution & Diagnostics
+To verify the secure uplink to the Netlify production environment:
+```bash
+node debug.js
+
 
 
 🛡️ Core Features
