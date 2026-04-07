@@ -13,7 +13,6 @@ An immersive, production-ready AI gateway engineered for the Saudi telecommunica
 * **Backend:** Node.js Serverless functions deployed via **Netlify**, isolating business logic from the client.
 * **Security:** Implemented **Zero-Trust** secret management. API keys are handled via server-side environment variables.
 * **Observability:** Built a custom CLI diagnostic suite (`debug.js`) for real-time API health monitoring and payload validation.
-
 ### 🗺️ System Data Flow (The "Edge" Pipeline)
 
 ```mermaid
@@ -25,6 +24,7 @@ graph TD
     C -->|Metadata Injection| B
     B -->|Response + Latency Log| A
     B -.->|Async Logging| E[(Audit Database Schema)]
+
 
 🛡️ Core Features
 ​Custom Persona Engine: Injects deep regulatory context into every inference call.
