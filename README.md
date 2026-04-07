@@ -29,3 +29,14 @@ graph TD
 To verify the uplink to the Netlify production server:
 ```bash
 node debug.js
+## 🚀 Local Development
+
+### Using Docker (Recommended)
+1. Build: `docker build -t ctc-ai .`
+2. Run: `docker run -p 8080:8080 --env-file .env ctc-ai`
+
+### Manual Setup
+1. `npm install`
+2. `npm test`
+3. `npm start`
+
