@@ -77,10 +77,53 @@
 
         // QUERY HANDLING
         async function sendQuery() {
-            const input = document.getElementById('user-input');
-            const container = document.getElementById('chat-container');
-            const history = document.getElementById('history-list');
-            const query = input.value.trim();
+    const input = document.getElementById('user-input');
+    const container = document.getElementById('chat-container');
+    const query = input.value.trim();
+    if (!query) return;
+
+    // 1. Add User Bubble (Better Performance)
+    const userDiv = document.createElement('div');
+    userDiv.className = 'flex justify-end';
+    userDiv.innerHTML = `<div class="bg-slate-800/80 border border-slate-700 px-5 py-3 rounded-2xl rounded-tr-none max-w-[80%] text-sm">${query}</div>`;
+    container.appendChild(userDiv);
+    
+    input.value = '';
+
+    // 2. Loading State
+    const loaderId = 'loader-' + Date.now();
+    const loaderDiv = document.createElement('div');
+    loaderDiv.id = loaderId;
+    loaderDiv.className = 'text-[10px] text-yellow-600 animate-pulse font-mono pl-2 tracking-widest uppercase';
+    loaderDiv.innerText = 'Establishing Uplink...';
+    container.appendChild(loaderDiv);
+    
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+
+    try {
+        const res = await fetch('/.netlify/functions/chat', {
+            method: 'POST',
+            body: JSON.stringify({ prompt: query })
+        });
+        const data = await res.json();
+        
+        document.getElementById(loaderId).remove();
+
+        // 3. Specialist Response
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'bg-slate-900 border-l-2 border-yellow-600 p-6 rounded-r-2xl shadow-xl';
+        responseDiv.innerHTML = `
+            <span class="text-[9px] font-black text-yellow-600 tracking-widest uppercase mb-4 block">Official CTC Data Packet</span>
+            <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">${data.text}</div>`;
+        container.appendChild(responseDiv);
+        
+    } catch (err) {
+        document.getElementById(loaderId).innerText = 'CONNECTION ERROR: FAILOVER NODES EXHAUSTED';
+    }
+    
+    setTimeout(() => container.scrollTop = container.scrollHeight, 100);
+}
+
             
             if (!query) return;
 
