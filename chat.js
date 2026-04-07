@@ -1,4 +1,4 @@
-Nconst persona = require('../../config/specialist');
+const persona = require('../../config/specialist');
 const features = require('../../config/features');
 
 exports.handler = async (event, context) => {
