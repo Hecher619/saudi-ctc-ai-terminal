@@ -23,7 +23,8 @@ graph TD
     D -->|AI Inference| C
     C -->|Metadata Injection| B
     B -->|Response + Latency Log| A
-    B -.->|Async Logging| E[(Audit Database Schema)]
+    B -.->|Async
+ Logging| E[(Audit Database Schema)]
 
 
 🛡️ Core Features
