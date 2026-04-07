@@ -86,3 +86,11 @@ serve(async (req) => {
   }
 });
 
+// Defensive: Basic Rate Limiting Check
+if (text.length > 2000) {
+  return new Response(JSON.stringify({ error: "Payload too large for regulatory processing" }), {
+    status: 413,
+    headers: corsHeaders
+  });
+}
+
