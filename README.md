@@ -17,15 +17,13 @@ An immersive, production-ready AI gateway engineered for the Saudi telecommunica
 
 ```mermaid
 graph TD
-    A[User Terminal] -->|Secure Request| B(Netlify Edge Function)
-    B -->|Sanitization & Trace ID| C(Persona Engine)
-    C -->|Authorized Payload| D[Gemini 1.5 Flash API]
-    D -->|AI Inference| C
-    C -->|Metadata Injection| B
-    B -->|Response + Latency Log| A
-    B -->|Async Logging| E[(Audit Database Schema)]
-
-
+    A[Terminal] --> B(Netlify Edge)
+    B --> C(Persona Engine)
+    C --> D[Gemini API]
+    D --> C
+    C --> B
+    B --> A
+    B --> E[(Audit Logs)]
 
 🛡️ Core Features
 ​Custom Persona Engine: Injects deep regulatory context into every inference call.
